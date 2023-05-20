@@ -1,36 +1,64 @@
-import { MDBTable, MDBTableHead, MDBTableBody } from 'mdb-react-ui-kit';
-import React, { useContext } from 'react';
-import MyContext from './App';
+import React, { useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import ContactTable from './ContactTable';
+
+
 
 
 const Contacts = ({ contacts }) => {
 
-  console.log(contacts);
+  const [show, setShow] = useState(false);
+  const [selectedContactId, setSelectedContactId] = useState(1);
 
-  return (
-    <MDBTable hover>
-      <MDBTableHead>
-        <tr>
-          <th scope='col'>id</th>
-          <th scope='col'>First Name</th>
-          <th scope='col'>Last Name</th>
-          <th scope='col'>Phone Number</th>
-        </tr>
-      </MDBTableHead>
-      <MDBTableBody>
-        {contacts.map(contact => {
-          return (
-            <tr key={contact.id}>
-              <th scope='row' >{contact.id}</th>
-              <td >{contact.firstName}</td>
-              <td >{contact.lastName}</td>
-              <td >{contact.phoneNumber}</td>
-            </tr>
-          )
-        })}
-      </MDBTableBody>
-    </MDBTable>
-  )
+  const selectedContact = contacts[selectedContactId - 1];
+  console.log(selectedContact.firstName);
+
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  const getEditModal = () => {
+    return (
+      <Modal
+        show={show}
+        onHide={handleClose}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Contact</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedContact.firstName}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button variant="primary">Understood</Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  }
+
+  const editModal = getEditModal();
+
+
+  if (show) {
+    return (
+      <>
+        <ContactTable contacts={contacts} setShow={setShow} setSelectedContactId={setSelectedContactId} />
+        <div>{editModal}</div>
+      </>
+    )
+  } else {
+    return (
+      <ContactTable contacts={contacts} setShow={setShow} setSelectedContactId={setSelectedContactId} />
+    )
+  }
+
 }
+
 
 export default Contacts

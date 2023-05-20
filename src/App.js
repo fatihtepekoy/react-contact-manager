@@ -2,14 +2,12 @@ import './styles.css';
 import Header from './Header';
 import ContactForm from './ContactForm';
 import Contacts from './Contacts';
-import React, { useState, createContext } from 'react';
+import React, { useState } from 'react';
 
 
 
 
 function App() {
-
-  const MyContext = createContext();
 
   const firstContact = [
     {

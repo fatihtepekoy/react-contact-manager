@@ -1,103 +1,87 @@
-import React, { useState, useEffect } from 'react';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+import React, { useState } from 'react';
 import ContactTable from './ContactTable';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
 
+const Contacts = ({ contacts, editContact }) => {
+  const [selectedContact, setSelectedContact] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
+  const handleOpenModal = () => {
+    setShowModal(true);
+  };
 
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setErrorMessage('');
+  };
 
-const Contacts = ({ contacts, setContacts }) => {
+  const handleEdit = contact => {
+    setSelectedContact(contact);
+    handleOpenModal();
+  };
 
+  const handleInputChange = event => {
+    const { name, value } = event.target;
+    setSelectedContact(prevContact => ({
+      ...prevContact,
+      [name]: value
+    }));
+  };
 
-  const [show, setShow] = useState(false);
-  const [selectedContactId, setSelectedContactId] = useState(1);
-
-  const selectedContact = contacts[selectedContactId - 1];
-  let updatedContacts;
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
-  const saveContact = (event) => {
-    const contact =
-    {
-      id: selectedContactId,
-      firstName: event.target.firstName.value,
-      lastName: event.target.lastName.value,
-      phoneNumber: event.target.phoneNumber.value
+  const handleSave = updatedContact => {
+    if (!updatedContact.firstName || !updatedContact.lastName || !updatedContact.phoneNumber) {
+      setErrorMessage('Please fill in all fields.');
+      return;
     }
 
-    updatedContacts = contacts.map(item => {
-      if (item.id === selectedContactId) {
-        return contact;
-      }
-      return item;
-    });
+    editContact(updatedContact.id, updatedContact);
+    handleCloseModal();
+  };
 
+  const renderEditModalBody = () => {
+    if (!selectedContact) return null;
 
-    setContacts(updatedContacts);
-
-  }
-
-
-  const getEditModal = () => {
     return (
-      <Modal
-        show={show}
-        onHide={handleClose}
-        backdrop="static"
-        keyboard={false}
-      >
+      <form>
+        <div className="error-message">{errorMessage}</div>
+        <div>
+          <label>First Name:</label>
+          <input type="text" name="firstName" value={selectedContact.firstName} onChange={handleInputChange} />
+        </div>
+        <div>
+          <label>Last Name:</label>
+          <input type="text" name="lastName" value={selectedContact.lastName} onChange={handleInputChange} />
+        </div>
+        <div>
+          <label>Phone Number:</label>
+          <input type="number" name="phoneNumber" value={selectedContact.phoneNumber} onChange={handleInputChange} />
+        </div>
+      </form>
+    );
+  };
+
+  return (
+    <div>
+      <ContactTable contacts={contacts} handleEdit={handleEdit} />
+
+      <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>Edit Contact</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          <form onSubmit={saveContact} id="contact-form">
-            <label>
-              First Name:
-              <input type="text" name="firstName" defaultValue={selectedContact.firstName} />
-            </label>
-            <label>
-              Last name:
-              <input type="text" name="lastName" defaultValue={selectedContact.lastName} />
-            </label>
-            <label>
-              Phone Number:
-              <input type="number" name="phoneNumber" defaultValue={selectedContact.phoneNumber} />
-            </label>
-          </form>
-        </Modal.Body>
+        <Modal.Body>{renderEditModalBody()}</Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={handleCloseModal}>
             Close
           </Button>
-          <Button type="submit" form="contact-form" variant="primary">Save</Button>
+          <Button variant="primary" onClick={() => handleSave(selectedContact)}>
+            Save
+          </Button>
         </Modal.Footer>
       </Modal>
-    );
-  }
+    </div>
+  );
+};
 
-  const editModal = getEditModal();
-
-  function getContactPart() {
-    if (show) {
-      return (
-        <>
-          <ContactTable contacts={contacts} setShow={setShow} setSelectedContactId={setSelectedContactId} />
-          <div>{editModal}</div>
-        </>
-      )
-    } else {
-      return (
-        <ContactTable contacts={contacts} setShow={setShow} setSelectedContactId={setSelectedContactId} />
-      )
-    }
-  }
-
-  return contacts.length > 0 ? getContactPart() : null;
-
-
-}
-
-
-export default Contacts
+export default Contacts;

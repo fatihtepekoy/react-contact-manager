@@ -1,40 +1,36 @@
 import './styles.css';
+import React, { useState } from 'react';
 import Header from './Header';
 import ContactForm from './ContactForm';
 import Contacts from './Contacts';
-import React, { useState, useEffect } from 'react';
-
-
-
 
 function App() {
+  const [contacts, setContacts] = useState([]);
 
-  var firstContact =
-  {
-    id: 1,
-    firstName: "Fatih",
-    lastName: "Tepekoy",
-    phoneNumber: "5332109104"
-  }
+  const addContact = (firstName, lastName, phoneNumber) => {
+    const newContact = {
+      id: contacts.length + 1,
+      firstName,
+      lastName,
+      phoneNumber
+    };
+    setContacts([...contacts, newContact]);
+  };
 
-
-
-  // Run! Like go get some data from an API.
-  const [contacts, setContacts] = useState([firstContact]);
-
-  // useEffect(() => {
-  //   setContacts(firstContact);
-  // }, []);
-
-
-
+  const editContact = (id, updatedContact) => {
+    const updatedContacts = contacts.map(contact =>
+      contact.id === id ? updatedContact : contact
+    );
+    setContacts(updatedContacts);
+  };
 
   return (
     <div>
       <Header />
-      <ContactForm contacts={contacts} setContacts={setContacts} />
-      <Contacts contacts={contacts} setContacts={setContacts} />
+      <ContactForm addContact={addContact} />
+      <Contacts contacts={contacts} editContact={editContact} />
     </div>
-  )
+  );
 }
+
 export default App;

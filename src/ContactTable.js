@@ -3,16 +3,7 @@ import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 
 
-
-
-const ContactTable = ({ contacts, setShow, setSelectedContactId }) => {
-
-  const openEditContactModel = () => setShow(true);
-
-  const editContact = (id) => {
-    openEditContactModel();
-    setSelectedContactId(id);
-  }
+const ContactTable = ({ contacts, editContact }) => {
 
   return (
     <MDBTable hover>
@@ -32,7 +23,7 @@ const ContactTable = ({ contacts, setShow, setSelectedContactId }) => {
               <td >{contact.firstName}</td>
               <td >{contact.lastName}</td>
               <td >{contact.phoneNumber}</td>
-              <td > <Button onClick={() => editContact(contact.id)} variant="primary">Edit</Button>{''} </td>
+              <td > <Button onClick={() => editContact(contact)} variant="primary">Edit</Button>{''} </td>
             </tr>
           )
         })}

@@ -1,27 +1,18 @@
 const ContactForm = ({ contacts, setContacts }) => {
 
   const addContact = (event) => {
-    event.preventDefault();
-    var count = contacts.length;
+    event.preventDefault(); // Prevent default form submission
 
-
-    const contact =
+    const newContact =
     {
-      id: count + 1,
+      id: contacts.length + 1,
       firstName: event.target.firstName.value,
       lastName: event.target.lastName.value,
       phoneNumber: event.target.phoneNumber.value
     }
 
-
-
-
-    setContacts([...contacts, contact]);
-
-
+    setContacts([...contacts, newContact]);
   }
-
-
 
 
   return (

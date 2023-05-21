@@ -4,47 +4,47 @@ import Modal from 'react-bootstrap/Modal';
 import ContactTable from './ContactTable';
 
 
-
-
 const Contacts = ({ contacts, setContacts }) => {
 
-
   const [show, setShow] = useState(false);
-  const [selectedContactId, setSelectedContactId] = useState(1);
+  const [selectedContact, setSelectedContact] = useState(null);
 
-  const selectedContact = contacts[selectedContactId - 1];
-  let updatedContacts;
+  const handleCloseModal = () => setShow(false);
+  const handleOpenModal = () => setShow(true);
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const editContact = contact => {
+    setSelectedContact(contact);
+    handleOpenModal();
+  };
 
   const saveContact = (event) => {
+    event.preventDefault(); // Prevent default form submission
+    const contactForm = event.target;
+
     const contact =
     {
-      id: selectedContactId,
-      firstName: event.target.firstName.value,
-      lastName: event.target.lastName.value,
-      phoneNumber: event.target.phoneNumber.value
+      id: selectedContact.id,
+      firstName: contactForm.firstName.value,
+      lastName: contactForm.lastName.value,
+      phoneNumber: contactForm.phoneNumber.value
     }
 
-    updatedContacts = contacts.map(item => {
-      if (item.id === selectedContactId) {
-        return contact;
-      }
-      return item;
+    const updatedContacts = contacts.map(item => {
+      return item.id === selectedContact.id ? contact : item;
     });
 
-
     setContacts(updatedContacts);
-
+    handleCloseModal();
   }
 
 
-  const getEditModal = () => {
+  const renderEditModalBody = () => {
+    if (!selectedContact) return null;
+
     return (
       <Modal
         show={show}
-        onHide={handleClose}
+        onHide={handleCloseModal}
         backdrop="static"
         keyboard={false}
       >
@@ -68,7 +68,7 @@ const Contacts = ({ contacts, setContacts }) => {
           </form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={handleCloseModal}>
             Close
           </Button>
           <Button type="submit" form="contact-form" variant="primary">Save</Button>
@@ -77,25 +77,12 @@ const Contacts = ({ contacts, setContacts }) => {
     );
   }
 
-  const editModal = getEditModal();
-
-  function getContactPart() {
-    if (show) {
-      return (
-        <>
-          <ContactTable contacts={contacts} setShow={setShow} setSelectedContactId={setSelectedContactId} />
-          <div>{editModal}</div>
-        </>
-      )
-    } else {
-      return (
-        <ContactTable contacts={contacts} setShow={setShow} setSelectedContactId={setSelectedContactId} />
-      )
-    }
-  }
-
-  return contacts.length > 0 ? getContactPart() : null;
-
+  return (
+    <>
+      <ContactTable contacts={contacts} editContact={editContact} />
+      <div>{renderEditModalBody()}</div>
+    </>
+  );
 
 }
 
